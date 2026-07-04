@@ -8,34 +8,26 @@ export function useHabits() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        let cancelled = false;
-
-        (async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const [h, l] = await Promise.all([
-                    supabaseStorage.getHabits(),
-                    supabaseStorage.getLogs(),
-                ]);
-                if (!cancelled) {
-                    setHabits(h);
-                    setLogs(l);
-                }
-            } catch (e) {
-                if (!cancelled) {
-                    setError(e instanceof Error ? e.message : 'Failed to load data');
-                }
-            } finally {
-                if (!cancelled) setLoading(false);
-            }
-        })();
-
-        return () => {
-            cancelled = true;
-        };
+    const load = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const [h, l] = await Promise.all([
+                supabaseStorage.getHabits(),
+                supabaseStorage.getLogs(),
+            ]);
+            setHabits(h);
+            setLogs(l);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Failed to load data');
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        load();
+    }, [load]);
 
     const addHabit = useCallback(async (name: string, color: string) => {
         const habit = await supabaseStorage.addHabit(name, color);
