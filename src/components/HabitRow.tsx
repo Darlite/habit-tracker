@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import type { Habit, HabitLog } from '../storage/types';
-import { toISODate } from '../lib/dates';
 import { Heatmap } from './Heatmap';
 
 type Props = {
@@ -17,14 +16,11 @@ export function HabitRow({ habit, logs, onToggle, onDelete }: Props) {
         [logs, habit.id]
     );
 
-    const streak = useMemo(() => calcStreak(loggedDates), [loggedDates]);
-
     return (
         <Card>
             <TopRow>
                 <Name>{habit.name}</Name>
                 <Right>
-                    {streak > 0 && <Streak>🔥 {streak}</Streak>}
                     <DeleteBtn
                         onClick={() => {
                             if (confirm(`Delete "${habit.name}"?`)) onDelete(habit.id);
@@ -41,25 +37,6 @@ export function HabitRow({ habit, logs, onToggle, onDelete }: Props) {
             />
         </Card>
     );
-}
-
-// Count consecutive days ending today (or yesterday if today not done yet)
-function calcStreak(loggedDates: Set<string>): number {
-    let count = 0;
-    const cursor = new Date();
-    cursor.setHours(0, 0, 0, 0);
-
-    // If today is not logged, start counting from yesterday
-    if (!loggedDates.has(toISODate(cursor))) {
-        cursor.setDate(cursor.getDate() - 1);
-    }
-
-    while (loggedDates.has(toISODate(cursor))) {
-        count++;
-        cursor.setDate(cursor.getDate() - 1);
-    }
-
-    return count;
 }
 
 const Card = styled.div`
@@ -86,11 +63,6 @@ const Right = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-`;
-
-const Streak = styled.span`
-  font-size: 14px;
-  color: #666;
 `;
 
 const DeleteBtn = styled.button`
