@@ -8,11 +8,12 @@ type Props = {
     onToggle: (date: string) => void;
 };
 
-// Weekday labels shown on the left (rows 0, 2, 4 -> Mon, Wed, Fri)
+// Weekday labels shown on the left (rows 0, 2, 4, 6 -> Mon, Wed, Fri, Sun)
 const WEEKDAY_LABELS: Record<number, string> = {
     0: 'Mon',
     2: 'Wed',
     4: 'Fri',
+    6: 'Sun'
 };
 
 export function Heatmap({ color, loggedDates, onToggle }: Props) {
