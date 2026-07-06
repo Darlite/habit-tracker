@@ -60,14 +60,6 @@ export function HabitRow({ habit, logs, onToggle, onDelete }: Props) {
     );
 }
 
-// local helper to avoid importing toISODate just for this
-function toISODateLocal(date: Date): string {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-}
-
 const Card = styled.div`
   border: 1px solid #e0e0e0;
   border-radius: 8px;
