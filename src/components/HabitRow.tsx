@@ -22,14 +22,12 @@ export function HabitRow({ habit, logs, onToggle, onDelete }: Props) {
     const todayDone = loggedDates.has(today);
     const yesterdayDone = loggedDates.has(yesterday);
 
-    const streak = useMemo(() => calcStreak(loggedDates), [loggedDates]);
 
     return (
         <Card>
             <TopRow>
                 <Name>{habit.name}</Name>
                 <Right>
-                    {streak > 0 && <Streak>🔥 {streak}</Streak>}
                     <DeleteBtn
                         onClick={() => {
                             if (confirm(`Delete "${habit.name}"?`)) onDelete(habit.id);
@@ -60,23 +58,6 @@ export function HabitRow({ habit, logs, onToggle, onDelete }: Props) {
             </Actions>
         </Card>
     );
-}
-
-function calcStreak(loggedDates: Set<string>): number {
-    let count = 0;
-    const cursor = new Date();
-    cursor.setHours(0, 0, 0, 0);
-
-    if (!loggedDates.has(toISODateLocal(cursor))) {
-        cursor.setDate(cursor.getDate() - 1);
-    }
-
-    while (loggedDates.has(toISODateLocal(cursor))) {
-        count++;
-        cursor.setDate(cursor.getDate() - 1);
-    }
-
-    return count;
 }
 
 // local helper to avoid importing toISODate just for this
@@ -111,11 +92,6 @@ const Right = styled.div`
     display: flex;
     align-items: center;
     gap: 12px;
-`;
-
-const Streak = styled.span`
-    font-size: 14px;
-    color: #666;
 `;
 
 const DeleteBtn = styled.button`
