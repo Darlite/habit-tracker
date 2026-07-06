@@ -57,3 +57,13 @@ export function getMonthLabels(weeks: Date[][]): MonthLabel[] {
 
     return labels;
 }
+
+export function getToday(): string {
+    return toISODate(new Date());
+}
+
+export function getYesterday(): string {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return toISODate(d);
+}

@@ -1,34 +1,29 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import { buildYearGrid, getMonthLabels, toISODate } from '../lib/dates';
 
 type Props = {
     color: string;
     loggedDates: Set<string>;
-    onToggle: (date: string) => void;
 };
 
-// Weekday labels shown on the left (rows 0, 2, 4, 6 -> Mon, Wed, Fri, Sun)
 const WEEKDAY_LABELS: Record<number, string> = {
     0: 'Mon',
     2: 'Wed',
     4: 'Fri',
-    6: 'Sun'
 };
 
-export function Heatmap({ color, loggedDates, onToggle }: Props) {
+export function Heatmap({ color, loggedDates }: Props) {
     const weeks = useMemo(() => buildYearGrid(), []);
     const monthLabels = useMemo(() => getMonthLabels(weeks), [weeks]);
     const todayISO = toISODate(new Date());
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Scroll to the most recent week on mount
     useEffect(() => {
         const el = scrollRef.current;
         if (el) el.scrollLeft = el.scrollWidth;
     }, []);
 
-    // Map weekIndex -> month name for quick lookup in the header row
     const monthByWeek = useMemo(() => {
         const map = new Map<number, string>();
         monthLabels.forEach((l) => map.set(l.weekIndex, l.name));
@@ -40,7 +35,6 @@ export function Heatmap({ color, loggedDates, onToggle }: Props) {
             <Table>
                 <thead>
                 <tr>
-                    {/* empty corner cell above the weekday labels */}
                     <CornerTh />
                     {weeks.map((_, wi) => (
                         <MonthTh key={wi}>{monthByWeek.get(wi) ?? ''}</MonthTh>
@@ -64,9 +58,6 @@ export function Heatmap({ color, loggedDates, onToggle }: Props) {
                                         $color={color}
                                         $future={isFuture}
                                         title={iso}
-                                        onClick={() => {
-                                            if (!isFuture) onToggle(iso);
-                                        }}
                                     />
                                 </Td>
                             );
@@ -80,31 +71,29 @@ export function Heatmap({ color, loggedDates, onToggle }: Props) {
 }
 
 const Scroll = styled.div`
-  overflow-x: auto;
-  padding-bottom: 4px;
-  max-width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    max-width: 100%;
 `;
 
 const Table = styled.table`
-  border-collapse: separate;
-  border-spacing: 3px;
-  /* prevent the table from stretching cells */
-  table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 3px;
+    table-layout: fixed;
 `;
 
 const CornerTh = styled.th`
-  width: 28px;
+    width: 28px;
 `;
 
 const MonthTh = styled.th`
-  font-size: 10px;
-  font-weight: 400;
-  color: #767676;
-  text-align: left;
-  height: 14px;
-  /* let labels overflow to the right so they aren't clipped to 12px */
-  white-space: nowrap;
-  overflow: visible;
+    font-size: 10px;
+    font-weight: 400;
+    color: #767676;
+    text-align: left;
+    height: 14px;
+    white-space: nowrap;
+    overflow: visible;
 `;
 
 const WeekdayTh = styled.th`
@@ -127,10 +116,5 @@ const Cell = styled.div<{ $done: boolean; $color: string; $future: boolean }>`
     height: 12px;
     border-radius: 2px;
     background: ${({ $done, $color }) => ($done ? $color : '#ebedf0')};
-    cursor: ${({ $future }) => ($future ? 'default' : 'pointer')};
     opacity: ${({ $future }) => ($future ? 0.4 : 1)};
-
-    &:hover {
-        outline: ${({ $future }) => ($future ? 'none' : '1px solid #999')};
-    }
 `;
